@@ -2,28 +2,62 @@
 
 Quarterly regressions of US commercial real estate sales volume (MSCI RCA), by property type, built for the CRE services 2027 preview (CBRE, JLL, NMRK, CWK, CIGI).
 
-**Private repository.** The workbooks contain MSCI RCA data. MSCI's terms restrict redistribution and use of its data with AI tools unless licensed, so keep this repository private and check your firm's license before sharing.
-
 ## Files
 
 | File | What it is |
 |---|---|
-| `RCA_Volume_Regression_by_Type.xlsx` | Main workbook: one regression per property type plus total, quarterly forecast 4Q26-4Q28 |
-| `archive/RCA_Volume_Regression_total_only.xlsx` | Earlier single-equation version (total market only), kept for reference |
+| `cre_volume_model.csv` | **The whole model in one CSV**: all data and live formulas on one sheet. Use this to rebuild the workbook by copy-paste. |
+| `RCA_Volume_Regression_by_Type.xlsx` | The same model as a formatted, multi-tab Excel workbook, with a chart. |
+| `archive/RCA_Volume_Regression_total_only.xlsx` | Earlier single-equation version (total market only). |
 
-## How the main workbook works
+## Rebuilding the model from the CSV
 
-The workbook is self-contained. Every formula links to cells inside the same file, with no links to other files, so the links keep working wherever you open it.
+**Copy and paste (for example, inside a virtual desktop):**
 
-- **Summary**: the only tab you edit. Change the yellow cells: the 10-yr path, Baa spread, lending standards, rate volatility, policy uncertainty, CPI, unemployment, yield curve, GDP growth, e-commerce share, industrial $/sf growth, and a cap rate path for each property type, all by quarter. The tab also shows model fit, quarterly and annual forecasts by type, sensitivities and a chart.
-- **Macro**: shared drivers (FRED data plus your forecast inputs), and the regressors derived from them.
-- **Total, Apartment, Industrial, Office, Retail, Hotel, Dev_Site**: one tab per regression. The top shows the coefficients, which come from Excel `LINEST` over 2007Q3-2026Q3 and update if you change the data. Below that are the quarterly data, the regressors, the fitted values and the forecast.
-- **Spec_Tests**: the variables tested and why they were kept or rejected.
-- **Sources**: data sources and definitions.
+1. On GitHub, open `cre_volume_model.csv`, click **Raw**, then press Ctrl+A and Ctrl+C.
+2. In a new Excel workbook, click cell A1 and press Ctrl+V. Everything lands in column A.
+3. With column A selected, go to Data > Text to Columns > Delimited > Next. Tick **Comma** only, set the text qualifier to `"`, then click Finish. The formulas calculate.
+4. Save as `.xlsx`.
 
-Color code: blue = reported data, black = formulas, green = links, yellow = your inputs, grey rows = forecast quarters.
+**Or download it:** click **Download raw file**, open it in Excel, then Save As `.xlsx`. You skip step 3 this way.
 
-## Model fit (2007Q3-2026Q3, 77 quarters)
+If the formulas show up as text, column A was formatted as Text. Set it to General and run step 3 again.
+
+Every formula refers only to cells on the same sheet, so the links work whatever you name the sheet. Formatting and the chart don't carry over in CSV. Everything was checked: the CSV rebuild reproduces all 20,041 numbers in the Excel workbook exactly.
+
+## Where things are in the CSV
+
+Each block starts with a `### SHEET: name ###` row. Below it are that tab's rows from the Excel workbook, in the same columns.
+
+| Rows | Block | What it holds |
+|---|---|---|
+| 1-109 | Summary | Model fit, inputs, forecasts, sensitivities |
+| 112-231 | Macro | Shared drivers and derived regressors |
+| 234-379 | Total | Total-market regression |
+| 382-527 | Apartment | Apartment regression |
+| 530-675 | Industrial | Industrial regression |
+| 678-823 | Office | Office regression |
+| 826-971 | Retail | Retail regression |
+| 974-1119 | Hotel | Hotel regression |
+| 1122-1267 | Dev_Site | Dev site regression |
+| 1270-1294 | Spec_Tests | Variables tested and why kept or rejected |
+| 1297-1305 | Sources | Data sources |
+
+**Inputs to edit:** Summary rows 19-39, in columns B-J (4Q26-4Q28). These are the yellow cells in the Excel version:
+
+- the 10-yr path, Baa spread, lending standards, 10-yr and Baa volatility, policy uncertainty, CPI, unemployment and yield curve;
+- a cap rate path for each property type;
+- the growth assumptions in column B.
+
+Forecast outputs are in Summary rows 44-73.
+
+## How the model works
+
+- Each regression explains quarterly volume growth (log YoY). The drivers are the type's own RCA 12-month cap rate change, the 10-yr, the Baa spread, real GDP, bank lending standards, and mean reversion of volume to its share of GDP. Each model adds a few drivers of its own (see Spec_Tests).
+- Coefficients come from Excel `LINEST` over 2007Q3-2026Q3 (77 quarters), so they update if you change the data.
+- Forecast volume = volume four quarters earlier x EXP(model growth).
+
+## Model fit (2007Q3-2026Q3)
 
 | Model | R-squared | Out-of-sample MAE (log pts) |
 |---|---|---|
@@ -36,10 +70,6 @@ Color code: blue = reported data, black = formulas, green = links, yellow = your
 | Dev site | 0.760 | 0.212 |
 
 Out-of-sample: estimated through 2021Q4, predicting 2022Q1-2026Q3.
-
-## Updating the data
-
-To roll forward a quarter, add the new RCA volume and 12-month cap rates (RCA Standardized Downloads, US All - Volume and Pricing) and the FRED series listed on the Sources tab in the next row of each tab. Then extend the `LINEST` ranges at the top of each regression tab.
 
 ## Data sources
 
