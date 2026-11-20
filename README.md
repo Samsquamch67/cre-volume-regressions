@@ -6,26 +6,26 @@ Quarterly regressions of US commercial real estate sales volume (MSCI RCA), by p
 
 | File | What it is |
 |---|---|
-| `cre_volume_model.csv` | **The whole model in one CSV**: all data and live formulas on one sheet. Use this to rebuild the workbook by copy-paste. |
+| `cre_volume_model.tsv` | **The whole model in one file, for copy-paste.** All data and live formulas on one sheet, tab-separated, so Excel splits it into cells on paste. |
+| `cre_volume_model.csv` | The same content, comma-separated. Use it if you download and open the file instead of pasting. |
 | `RCA_Volume_Regression_by_Type.xlsx` | The same model as a formatted, multi-tab Excel workbook, with a chart. |
 | `archive/RCA_Volume_Regression_total_only.xlsx` | Earlier single-equation version (total market only). |
 
-## Rebuilding the model from the CSV
+## Rebuilding the model in Excel
 
 **Copy and paste (for example, inside a virtual desktop):**
 
-1. On GitHub, open `cre_volume_model.csv`, click **Raw**, then press Ctrl+A and Ctrl+C.
-2. In a new Excel workbook, click cell A1 and press Ctrl+V. Everything lands in column A.
-3. With column A selected, go to Data > Text to Columns > Delimited > Next. Tick **Comma** only, set the text qualifier to `"`, then click Finish. The formulas calculate.
-4. Save as `.xlsx`.
+1. On GitHub, open `cre_volume_model.tsv`, click **Raw**, then press Ctrl+A and Ctrl+C.
+2. In a new, blank Excel workbook, click cell A1 and press Ctrl+V. The data spreads across columns A-AC and the formulas calculate. There's no Text to Columns step.
+3. Save as `.xlsx`.
 
-**Or download it:** click **Download raw file**, open it in Excel, then Save As `.xlsx`. You skip step 3 this way.
+**Or download it:** open `cre_volume_model.csv`, click **Download raw file**, open it in Excel, then Save As `.xlsx`.
 
-If the formulas show up as text, column A was formatted as Text. Set it to General and run step 3 again.
+**If you see #VALUE!:** the regressions use LINEST, which returns #VALUE! if any cell in its data range holds text instead of a number, and that error then spreads through the forecast. Usually some rows didn't split into numbers. Check that the numbers in, for example, column C below row 240 are right-aligned (numbers, not text). The fix is to paste the `.tsv` into a new blank sheet. If you used the `.csv` with Text to Columns, select the whole of column A by clicking its header before you run it. Selecting with Ctrl+Shift+Down stops at the first blank row.
 
-Every formula refers only to cells on the same sheet, so the links work whatever you name the sheet. Formatting and the chart don't carry over in CSV. Everything was checked: the CSV rebuild reproduces all 20,041 numbers in the Excel workbook exactly.
+Every formula refers only to cells on the same sheet, so the links work whatever you name the sheet. Formatting and the chart don't carry over. Everything was checked: rebuilding from the file reproduces all 20,041 numbers in the Excel workbook exactly.
 
-## Where things are in the CSV
+## Where things are in the file
 
 Each block starts with a `### SHEET: name ###` row. Below it are that tab's rows from the Excel workbook, in the same columns.
 
